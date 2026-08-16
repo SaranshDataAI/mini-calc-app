@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini Calculator</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <h1>Calculator</h1>
+
+    <div class="inputs">
+      <input type="number" id="numA" placeholder="First number">
+      <select id="operator">
+        <option value="add">+</option>
+        <option value="subtract">−</option>
+        <option value="multiply">×</option>
+        <option value="divide">÷</option>
+      </select>
+      <input type="number" id="numB" placeholder="Second number">
+    </div>
+
+    <button id="calcBtn">Calculate</button>
+    <p id="result"></p>
+    <p id="error" class="error"></p>
+
+    <h2>History</h2>
+    <ul id="history"></ul>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
