@@ -1,33 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Mini Calculator</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <main class="card">
-    <h1>Calculator</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini Calculator</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <main class="calculator-app">
+      <section class="calculator" aria-label="Calculator">
+        <div class="calculator__header">
+          <span class="brand">mini calc</span>
+          <span class="status-dot" aria-hidden="true"></span>
+        </div>
 
-    <div class="inputs">
-      <input type="number" id="numA" placeholder="First number">
-      <select id="operator">
-        <option value="add">+</option>
-        <option value="subtract">−</option>
-        <option value="multiply">×</option>
-        <option value="divide">÷</option>
-      </select>
-      <input type="number" id="numB" placeholder="Second number">
-    </div>
+        <div class="calculator__screen" aria-live="polite">
+          <div class="screen__expression" id="expression">0</div>
+          <div class="screen__value" id="result">0</div>
+        </div>
 
-    <button id="calcBtn">Calculate</button>
-    <p id="result"></p>
-    <p id="error" class="error"></p>
+        <div class="calculator__keypad">
+          <button class="key key--function" data-action="clear">AC</button>
+          <button class="key key--function" data-action="delete">DEL</button>
+          <button class="key key--operator" data-action="operator" data-value="divide">÷</button>
+          <button class="key key--operator" data-action="operator" data-value="multiply">×</button>
 
-    <h2>History</h2>
-    <ul id="history"></ul>
-  </main>
+          <button class="key key--number" data-value="7">7</button>
+          <button class="key key--number" data-value="8">8</button>
+          <button class="key key--number" data-value="9">9</button>
+          <button class="key key--operator" data-action="operator" data-value="subtract">−</button>
 
-  <script src="script.js"></script>
-</body>
+          <button class="key key--number" data-value="4">4</button>
+          <button class="key key--number" data-value="5">5</button>
+          <button class="key key--number" data-value="6">6</button>
+          <button class="key key--operator" data-action="operator" data-value="add">+</button>
+
+          <button class="key key--number" data-value="1">1</button>
+          <button class="key key--number" data-value="2">2</button>
+          <button class="key key--number" data-value="3">3</button>
+          <button class="key key--equals" id="calcBtn" data-action="calculate">=</button>
+
+          <button class="key key--number key--wide" data-value="0">0</button>
+          <button class="key key--decimal" data-value=".">.</button>
+        </div>
+
+        <p id="error" class="error" aria-live="polite"></p>
+      </section>
+
+      <aside class="history-panel">
+        <h2>History</h2>
+        <ul id="history"></ul>
+      </aside>
+    </main>
+
+    <script src="script.js"></script>
+  </body>
 </html>
