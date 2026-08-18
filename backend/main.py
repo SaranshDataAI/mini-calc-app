@@ -71,3 +71,10 @@ def calculate(request: schemas.CalculationRequest, db: Session = Depends(get_db)
 @app.get("/history", response_model=List[schemas.CalculationResponse])
 def get_history(db: Session = Depends(get_db)):
     return db.query(models.Calculation).order_by(models.Calculation.id.desc()).all()
+
+
+@app.delete("/history")
+def clear_history(db: Session = Depends(get_db)):
+    deleted = db.query(models.Calculation).delete()
+    db.commit()
+    return {"message": "History cleared", "deleted": deleted}

@@ -49,3 +49,11 @@ def test_history_returns_list():
     response = client.get("/history")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
+
+
+def test_clear_history():
+    client.post("/calculate", json={"a": 2, "b": 3, "operator": "add"})
+    response = client.delete("/history")
+    assert response.status_code == 200
+    assert response.json()["message"] == "History cleared"
+    assert client.get("/history").json() == []

@@ -5,6 +5,7 @@ const expressionEl = document.getElementById("expression");
 const errorEl = document.getElementById("error");
 const historyEl = document.getElementById("history");
 const calcBtn = document.getElementById("calcBtn");
+const clearHistoryBtn = document.getElementById("clearHistoryBtn");
 
 let firstValue = "";
 let secondValue = "";
@@ -251,6 +252,25 @@ calcBtn.addEventListener("click", () => {
   errorEl.textContent = "Please complete the calculation.";
 });
 
+async function clearHistory() {
+  try {
+    const response = await fetch(`${API_URL}/history`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      const data = await response.json();
+      errorEl.textContent = data.detail || "Could not clear history.";
+      return;
+    }
+
+    errorEl.textContent = "";
+    historyEl.innerHTML = "";
+  } catch (error) {
+    errorEl.textContent = "Could not clear history.";
+  }
+}
+
 async function loadHistory() {
   try {
     const response = await fetch(`${API_URL}/history`);
@@ -266,6 +286,8 @@ async function loadHistory() {
     historyEl.innerHTML = "<li>History unavailable.</li>";
   }
 }
+
+clearHistoryBtn.addEventListener("click", clearHistory);
 
 resetCalculatorState();
 loadHistory();
