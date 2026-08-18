@@ -1,7 +1,7 @@
 # Mini Calculator — Full Stack Practice Project
 
 A small calculator app with a saved history, built specifically to
-practice real git/GitHub workflow across a full stack.
+practice real git/GitHub workflow across a full stack and follow proper CI/CD pipelines.
 
 ## The layers
 
