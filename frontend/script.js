@@ -16,6 +16,7 @@ const operatorButtons = document.querySelectorAll(".key--operator");
 const decimalButton = document.querySelector(".key--decimal");
 const clearButton = document.querySelector('[data-action="clear"]');
 const deleteButton = document.querySelector('[data-action="delete"]');
+const sqrtButton = document.querySelector('[data-action="sqrt"]');
 
 function updateDisplay() {
   const displayValue = secondValue || firstValue || "0";
@@ -143,7 +144,15 @@ function formatValue(value) {
 }
 
 function symbolFor(operator) {
-  return { add: "+", subtract: "−", multiply: "×", divide: "÷" }[operator] || operator;
+  return { add: "+", subtract: "−", multiply: "×", divide: "÷", sqrt: "√" }[operator] || operator;
+}
+
+function formatHistoryItem(item) {
+  if (item.operator === "sqrt") {
+    return `√${formatValue(item.a)} = ${formatValue(item.result)}`;
+  }
+
+  return `${formatValue(item.a)} ${symbolFor(item.operator)} ${formatValue(item.b)} = ${formatValue(item.result)}`;
 }
 
 numberButtons.forEach((button) => {
@@ -161,6 +170,54 @@ operatorButtons.forEach((button) => {
 });
 
 clearButton.addEventListener("click", resetCalculatorState);
+
+sqrtButton.addEventListener("click", async () => {
+  const rawValue = firstValue || secondValue;
+
+  if (!rawValue) {
+    errorEl.textContent = "Enter a number first.";
+    return;
+  }
+
+  const value = parseFloat(rawValue);
+
+  if (Number.isNaN(value)) {
+    errorEl.textContent = "Please enter a valid number.";
+    return;
+  }
+
+  if (value < 0) {
+    errorEl.textContent = "Cannot take square root of a negative number.";
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/calculate`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ a: value, b: 0, operator: "sqrt" }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      errorEl.textContent = data.detail || "Something went wrong.";
+      return;
+    }
+
+    const result = formatValue(data.result);
+    resultEl.textContent = result;
+    expressionEl.textContent = `√${formatValue(value)} =`;
+    firstValue = result;
+    secondValue = "";
+    currentOperator = null;
+    waitingForSecondValue = false;
+    errorEl.textContent = "";
+    await loadHistory();
+  } catch (error) {
+    errorEl.textContent = "Could not reach the server. Is the backend running?";
+  }
+});
 
 deleteButton.addEventListener("click", () => {
   if (waitingForSecondValue && secondValue) {
@@ -202,7 +259,7 @@ async function loadHistory() {
     historyEl.innerHTML = "";
     data.forEach((item) => {
       const li = document.createElement("li");
-      li.textContent = `${item.a} ${symbolFor(item.operator)} ${item.b} = ${formatValue(item.result)}`;
+      li.textContent = formatHistoryItem(item);
       historyEl.appendChild(li);
     });
   } catch (error) {
