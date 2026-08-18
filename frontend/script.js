@@ -1,20 +1,109 @@
 const API_URL = "http://127.0.0.1:8000";
 
-const calcBtn = document.getElementById("calcBtn");
 const resultEl = document.getElementById("result");
+const expressionEl = document.getElementById("expression");
 const errorEl = document.getElementById("error");
 const historyEl = document.getElementById("history");
+const calcBtn = document.getElementById("calcBtn");
 
-calcBtn.addEventListener("click", async () => {
+let firstValue = "";
+let secondValue = "";
+let currentOperator = null;
+let waitingForSecondValue = false;
+
+const numberButtons = document.querySelectorAll(".key--number");
+const operatorButtons = document.querySelectorAll(".key--operator");
+const decimalButton = document.querySelector(".key--decimal");
+const clearButton = document.querySelector('[data-action="clear"]');
+const deleteButton = document.querySelector('[data-action="delete"]');
+
+function updateDisplay() {
+  const displayValue = secondValue || firstValue || "0";
+  resultEl.textContent = displayValue;
+
+  if (currentOperator && firstValue) {
+    expressionEl.textContent = `${firstValue} ${symbolFor(currentOperator)}`;
+  } else {
+    expressionEl.textContent = firstValue || "0";
+  }
+}
+
+function resetCalculatorState() {
+  firstValue = "";
+  secondValue = "";
+  currentOperator = null;
+  waitingForSecondValue = false;
   errorEl.textContent = "";
-  resultEl.textContent = "";
+  updateDisplay();
+}
 
-  const a = parseFloat(document.getElementById("numA").value);
-  const b = parseFloat(document.getElementById("numB").value);
-  const operator = document.getElementById("operator").value;
+function addDigit(value) {
+  if (waitingForSecondValue) {
+    secondValue = secondValue ? secondValue + value : value;
+    updateDisplay();
+    return;
+  }
+
+  if (currentOperator && !firstValue) {
+    firstValue = "0";
+  }
+
+  firstValue = firstValue ? firstValue + value : value;
+  updateDisplay();
+}
+
+function addDecimal() {
+  if (waitingForSecondValue) {
+    if (!secondValue) {
+      secondValue = "0.";
+    } else if (!secondValue.includes(".")) {
+      secondValue += ".";
+    }
+    updateDisplay();
+    return;
+  }
+
+  if (!firstValue) {
+    firstValue = "0.";
+  } else if (!firstValue.includes(".")) {
+    firstValue += ".";
+  }
+  updateDisplay();
+}
+
+function setOperator(nextOperator) {
+  errorEl.textContent = "";
+
+  if (!firstValue) {
+    return;
+  }
+
+  if (currentOperator && !waitingForSecondValue) {
+    calculateFromInputs();
+  }
+
+  currentOperator = nextOperator;
+  waitingForSecondValue = true;
+  secondValue = "";
+  expressionEl.textContent = `${firstValue} ${symbolFor(currentOperator)}`;
+}
+
+async function calculateFromInputs() {
+  if (!firstValue || !currentOperator || !secondValue) {
+    if (firstValue && currentOperator && !secondValue) {
+      const a = parseFloat(firstValue);
+      if (Number.isNaN(a)) {
+        errorEl.textContent = "Please enter a valid number.";
+      }
+    }
+    return;
+  }
+
+  const a = parseFloat(firstValue);
+  const b = parseFloat(secondValue);
 
   if (Number.isNaN(a) || Number.isNaN(b)) {
-    errorEl.textContent = "Enter both numbers.";
+    errorEl.textContent = "Please enter valid numbers.";
     return;
   }
 
@@ -22,7 +111,7 @@ calcBtn.addEventListener("click", async () => {
     const response = await fetch(`${API_URL}/calculate`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ a, b, operator }),
+      body: JSON.stringify({ a, b, operator: currentOperator }),
     });
 
     const data = await response.json();
@@ -32,27 +121,94 @@ calcBtn.addEventListener("click", async () => {
       return;
     }
 
-    resultEl.textContent = `Result: ${data.result}`;
-    loadHistory();
-  } catch (err) {
+    resultEl.textContent = formatValue(data.result);
+    expressionEl.textContent = `${a} ${symbolFor(currentOperator)} ${b} =`;
+    firstValue = formatValue(data.result);
+    secondValue = "";
+    currentOperator = null;
+    waitingForSecondValue = false;
+    await loadHistory();
+  } catch (error) {
     errorEl.textContent = "Could not reach the server. Is the backend running?";
   }
-});
+}
 
-async function loadHistory() {
-  const response = await fetch(`${API_URL}/history`);
-  const data = await response.json();
+function formatValue(value) {
+  if (!Number.isFinite(value)) {
+    return "Error";
+  }
 
-  historyEl.innerHTML = "";
-  data.forEach((item) => {
-    const li = document.createElement("li");
-    li.textContent = `${item.a} ${symbolFor(item.operator)} ${item.b} = ${item.result}`;
-    historyEl.appendChild(li);
-  });
+  const formatted = Number(value);
+  return Number.isInteger(formatted) ? String(formatted) : formatted.toFixed(2).replace(/\.00$/, "").replace(/(\.\d)0$/, "$1");
 }
 
 function symbolFor(operator) {
   return { add: "+", subtract: "−", multiply: "×", divide: "÷" }[operator] || operator;
 }
 
+numberButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    addDigit(button.dataset.value);
+  });
+});
+
+decimalButton.addEventListener("click", addDecimal);
+
+operatorButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    setOperator(button.dataset.value);
+  });
+});
+
+clearButton.addEventListener("click", resetCalculatorState);
+
+deleteButton.addEventListener("click", () => {
+  if (waitingForSecondValue && secondValue) {
+    secondValue = secondValue.slice(0, -1);
+  } else if (currentOperator && !waitingForSecondValue) {
+    currentOperator = null;
+  } else if (firstValue) {
+    firstValue = firstValue.slice(0, -1);
+  }
+
+  if (!firstValue && !secondValue && !currentOperator) {
+    resultEl.textContent = "0";
+    expressionEl.textContent = "0";
+  } else {
+    updateDisplay();
+  }
+});
+
+calcBtn.addEventListener("click", () => {
+  if (currentOperator && secondValue) {
+    calculateFromInputs();
+    return;
+  }
+
+  if (firstValue && !currentOperator) {
+    resultEl.textContent = firstValue;
+    expressionEl.textContent = firstValue;
+    return;
+  }
+
+  errorEl.textContent = "Please complete the calculation.";
+});
+
+async function loadHistory() {
+  try {
+    const response = await fetch(`${API_URL}/history`);
+    const data = await response.json();
+
+    historyEl.innerHTML = "";
+    data.forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = `${item.a} ${symbolFor(item.operator)} ${item.b} = ${formatValue(item.result)}`;
+      historyEl.appendChild(li);
+    });
+  } catch (error) {
+    historyEl.innerHTML = "<li>History unavailable.</li>";
+  }
+}
+
+resetCalculatorState();
 loadHistory();
