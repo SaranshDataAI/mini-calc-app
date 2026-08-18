@@ -146,6 +146,12 @@ body {
   font-size: 1.1rem;
 }
 
+.key--sqrt {
+  background: linear-gradient(180deg, #dbeafe, #93c5fd);
+  color: #172554;
+  font-size: 1.35rem;
+}
+
 .key--equals {
   background: linear-gradient(180deg, #4ade80, var(--key-equals));
   color: #062d14;
