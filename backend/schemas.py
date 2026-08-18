@@ -7,14 +7,18 @@ kept separate on purpose — you don't always want to expose every DB
 column to the outside world.
 """
 
+from typing import Optional
+
 from pydantic import BaseModel
 from datetime import datetime
 
 
 class CalculationRequest(BaseModel):
     a: float
-    b: float
-    operator: str  # one of: "add", "subtract", "multiply", "divide"
+    # Optional because unary operators (like "sqrt") only need `a`.
+    # Defaults to 0 so it still has a value to store in the (non-nullable) db column.
+    b: Optional[float] = 0
+    operator: str  # one of: "add", "subtract", "multiply", "divide", "sqrt"
 
 
 class CalculationResponse(BaseModel):

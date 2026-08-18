@@ -8,6 +8,8 @@ fixed set of operators. Slightly less flexible, much safer — and this
 is exactly the tradeoff real APIs make.
 """
 
+import math
+
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -35,6 +37,8 @@ OPERATIONS = {
     "subtract": lambda a, b: a - b,
     "multiply": lambda a, b: a * b,
     "divide": lambda a, b: a / b,
+    # Unary operator: b is ignored (kept only so the db row has a value).
+    "sqrt": lambda a, b: math.sqrt(a),
 }
 
 
@@ -46,11 +50,14 @@ def calculate(request: schemas.CalculationRequest, db: Session = Depends(get_db)
     if request.operator == "divide" and request.b == 0:
         raise HTTPException(status_code=400, detail="Cannot divide by zero")
 
+    if request.operator == "sqrt" and request.a < 0:
+        raise HTTPException(status_code=400, detail="Cannot take square root of a negative number")
+
     result = OPERATIONS[request.operator](request.a, request.b)
 
     record = models.Calculation(
         a=request.a,
-        b=request.b,
+        b=request.b if request.operator != "sqrt" else 0,
         operator=request.operator,
         result=result,
     )

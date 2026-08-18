@@ -33,6 +33,17 @@ def test_unknown_operator():
     assert response.status_code == 400
 
 
+def test_sqrt():
+    response = client.post("/calculate", json={"a": 9, "operator": "sqrt"})
+    assert response.status_code == 200
+    assert response.json()["result"] == 3
+
+
+def test_sqrt_negative_number():
+    response = client.post("/calculate", json={"a": -4, "operator": "sqrt"})
+    assert response.status_code == 400
+
+
 def test_history_returns_list():
     client.post("/calculate", json={"a": 1, "b": 1, "operator": "add"})
     response = client.get("/history")
