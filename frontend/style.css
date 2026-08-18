@@ -174,10 +174,35 @@ body {
   padding: 22px 20px;
 }
 
+.history-panel__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
 .history-panel h2 {
-  margin: 0 0 14px;
+  margin: 0;
   font-size: 1.15rem;
   color: var(--text-primary);
+}
+
+.clear-history-btn {
+  border: none;
+  background: rgba(248, 113, 113, 0.12);
+  color: #fecaca;
+  border-radius: 10px;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.clear-history-btn:hover {
+  background: rgba(248, 113, 113, 0.2);
+  transform: translateY(-1px);
 }
 
 #history {
