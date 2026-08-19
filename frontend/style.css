@@ -170,6 +170,13 @@ body {
   font-weight: 600;
 }
 
+.keyboard-help {
+  margin: 8px 4px 0;
+  color: var(--text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
 .history-panel {
   padding: 22px 20px;
 }

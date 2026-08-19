@@ -172,7 +172,7 @@ operatorButtons.forEach((button) => {
 
 clearButton.addEventListener("click", resetCalculatorState);
 
-sqrtButton.addEventListener("click", async () => {
+async function calculateSquareRoot() {
   const rawValue = firstValue || secondValue;
 
   if (!rawValue) {
@@ -218,9 +218,9 @@ sqrtButton.addEventListener("click", async () => {
   } catch (error) {
     errorEl.textContent = "Could not reach the server. Is the backend running?";
   }
-});
+}
 
-deleteButton.addEventListener("click", () => {
+function deleteLastCharacter() {
   if (waitingForSecondValue && secondValue) {
     secondValue = secondValue.slice(0, -1);
   } else if (currentOperator && !waitingForSecondValue) {
@@ -235,9 +235,9 @@ deleteButton.addEventListener("click", () => {
   } else {
     updateDisplay();
   }
-});
+}
 
-calcBtn.addEventListener("click", () => {
+function handleCalculate() {
   if (currentOperator && secondValue) {
     calculateFromInputs();
     return;
@@ -250,6 +250,68 @@ calcBtn.addEventListener("click", () => {
   }
 
   errorEl.textContent = "Please complete the calculation.";
+}
+
+sqrtButton.addEventListener("click", calculateSquareRoot);
+deleteButton.addEventListener("click", deleteLastCharacter);
+calcBtn.addEventListener("click", handleCalculate);
+
+document.addEventListener("keydown", (event) => {
+  // Let native button keyboard activation work when a button has focus.
+  if (
+    event.target instanceof HTMLElement &&
+    event.target.closest("button") &&
+    (event.key === "Enter" || event.key === " ")
+  ) {
+    return;
+  }
+
+  if (/^\d$/.test(event.key)) {
+    event.preventDefault();
+    addDigit(event.key);
+    return;
+  }
+
+  const operatorForKey = {
+    "+": "add",
+    "-": "subtract",
+    "*": "multiply",
+    "/": "divide",
+  };
+
+  if (operatorForKey[event.key]) {
+    event.preventDefault();
+    setOperator(operatorForKey[event.key]);
+    return;
+  }
+
+  switch (event.key) {
+    case ".":
+      event.preventDefault();
+      addDecimal();
+      break;
+    case "Enter":
+    case "=":
+      event.preventDefault();
+      handleCalculate();
+      break;
+    case "Backspace":
+      event.preventDefault();
+      deleteLastCharacter();
+      break;
+    case "Escape":
+    case "Delete":
+    case "c":
+    case "C":
+      event.preventDefault();
+      resetCalculatorState();
+      break;
+    case "r":
+    case "R":
+      event.preventDefault();
+      calculateSquareRoot();
+      break;
+  }
 });
 
 async function clearHistory() {
