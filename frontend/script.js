@@ -263,6 +263,16 @@ deleteButton.addEventListener("click", deleteLastCharacter);
 calcBtn.addEventListener("click", handleCalculate);
 
 document.addEventListener("keydown", (event) => {
+  // Let form controls receive their own keyboard input instead of sending it
+  // to the calculator keypad handler.
+  if (
+    event.target instanceof HTMLInputElement ||
+    event.target instanceof HTMLSelectElement ||
+    event.target instanceof HTMLTextAreaElement
+  ) {
+    return;
+  }
+
   // Let native button keyboard activation work when a button has focus.
   if (
     event.target instanceof HTMLElement &&
