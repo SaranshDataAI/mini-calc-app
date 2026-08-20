@@ -8,6 +8,14 @@
   </head>
   <body>
     <main class="calculator-app">
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">Everyday tools</p>
+          <h1>Calculate with clarity.</h1>
+        </div>
+        <p class="app-header__note">Fast arithmetic, saved history, and base conversion in one quiet workspace.</p>
+      </header>
+
       <section class="calculator" aria-label="Calculator">
         <div class="calculator__header">
           <span class="brand">mini calc</span>
@@ -49,15 +57,8 @@
         <p class="keyboard-help">Keyboard: 0–9, . , +, −, ×, ÷, Enter/=, Backspace, Esc, R (√)</p>
       </section>
 
-      <aside class="history-panel">
-        <div class="history-panel__header">
-          <h2>History</h2>
-          <button type="button" class="clear-history-btn" id="clearHistoryBtn">Clear</button>
-        </div>
-        <ul id="history"></ul>
-      </aside>
-
-      <section class="converter-panel" aria-labelledby="converter-title">
+      <div class="workspace-rail">
+        <section class="converter-panel" aria-labelledby="converter-title">
         <div class="converter-panel__header">
           <h2 id="converter-title">Base converter</h2>
           <span>Integer values</span>
@@ -94,7 +95,19 @@
           <output id="conversionResult">—</output>
         </div>
         <p id="conversionError" class="error" aria-live="polite"></p>
-      </section>
+        </section>
+
+        <aside class="history-panel">
+          <div class="history-panel__header">
+            <div>
+              <p class="panel-kicker">Recent work</p>
+              <h2>History</h2>
+            </div>
+            <button type="button" class="clear-history-btn" id="clearHistoryBtn">Clear</button>
+          </div>
+          <ul id="history"></ul>
+        </aside>
+      </div>
     </main>
 
     <script src="script.js"></script>
