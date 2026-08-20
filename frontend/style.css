@@ -31,15 +31,16 @@ body {
 }
 
 .calculator-app {
-  width: min(930px, 90vw);
+  width: min(1220px, 92vw);
   display: grid;
-  grid-template-columns: minmax(320px, 420px) minmax(220px, 280px);
+  grid-template-columns: minmax(320px, 420px) minmax(220px, 280px) minmax(250px, 300px);
   gap: 28px;
   align-items: center;
 }
 
 .calculator,
-.history-panel {
+.history-panel,
+.converter-panel {
   background: rgba(15, 23, 42, 0.72);
   border: 1px solid var(--panel-border);
   border-radius: 26px;
@@ -179,6 +180,99 @@ body {
 
 .history-panel {
   padding: 22px 20px;
+}
+
+.converter-panel {
+  padding: 22px 20px;
+}
+
+.converter-panel__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.converter-panel h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.converter-panel__header span,
+.converter-panel label {
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.converter-panel > label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 700;
+}
+
+.converter-panel input,
+.converter-panel select {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  border-radius: 10px;
+  background: rgba(2, 8, 23, 0.55);
+  color: var(--text-primary);
+  padding: 10px 12px;
+  font: inherit;
+}
+
+.converter-panel input:focus,
+.converter-panel select:focus {
+  outline: 2px solid #38bdf8;
+  outline-offset: 2px;
+}
+
+.converter-panel__bases {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.converter-panel__bases label {
+  display: grid;
+  gap: 6px;
+  font-weight: 700;
+}
+
+.convert-btn {
+  width: 100%;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(180deg, #38bdf8, #0284c7);
+  color: #082f49;
+  padding: 11px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.conversion-result {
+  display: grid;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(163, 230, 53, 0.12);
+}
+
+.conversion-result span {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.conversion-result output {
+  color: #d9f99d;
+  font-size: 1.35rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
 }
 
 .history-panel__header {

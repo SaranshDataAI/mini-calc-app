@@ -6,6 +6,12 @@ const errorEl = document.getElementById("error");
 const historyEl = document.getElementById("history");
 const calcBtn = document.getElementById("calcBtn");
 const clearHistoryBtn = document.getElementById("clearHistoryBtn");
+const conversionValueEl = document.getElementById("conversionValue");
+const sourceBaseEl = document.getElementById("sourceBase");
+const targetBaseEl = document.getElementById("targetBase");
+const convertBtn = document.getElementById("convertBtn");
+const conversionResultEl = document.getElementById("conversionResult");
+const conversionErrorEl = document.getElementById("conversionError");
 
 let firstValue = "";
 let secondValue = "";
@@ -257,6 +263,16 @@ deleteButton.addEventListener("click", deleteLastCharacter);
 calcBtn.addEventListener("click", handleCalculate);
 
 document.addEventListener("keydown", (event) => {
+  // Let form controls receive their own keyboard input instead of sending it
+  // to the calculator keypad handler.
+  if (
+    event.target instanceof HTMLInputElement ||
+    event.target instanceof HTMLSelectElement ||
+    event.target instanceof HTMLTextAreaElement
+  ) {
+    return;
+  }
+
   // Let native button keyboard activation work when a button has focus.
   if (
     event.target instanceof HTMLElement &&
@@ -349,7 +365,46 @@ async function loadHistory() {
   }
 }
 
+async function convertBase() {
+  const value = conversionValueEl.value.trim();
+  conversionErrorEl.textContent = "";
+
+  if (!value) {
+    conversionErrorEl.textContent = "Enter an integer to convert.";
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/convert`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        value,
+        source_base: sourceBaseEl.value,
+        target_base: targetBaseEl.value,
+      }),
+    });
+    const data = await response.json();
+
+    if (!response.ok) {
+      conversionErrorEl.textContent = data.detail || "Could not convert that value.";
+      return;
+    }
+
+    conversionResultEl.textContent = data.result;
+  } catch (error) {
+    conversionErrorEl.textContent = "Could not reach the server. Is the backend running?";
+  }
+}
+
 clearHistoryBtn.addEventListener("click", clearHistory);
+convertBtn.addEventListener("click", convertBase);
+conversionValueEl.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    convertBase();
+  }
+});
 
 resetCalculatorState();
 loadHistory();

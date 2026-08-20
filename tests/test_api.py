@@ -9,6 +9,8 @@ call it correctly — which is a much smaller thing to get wrong.
 import sys
 import os
 
+import pytest
+
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "backend"))
 
 from fastapi.testclient import TestClient
@@ -41,6 +43,52 @@ def test_sqrt():
 
 def test_sqrt_negative_number():
     response = client.post("/calculate", json={"a": -4, "operator": "sqrt"})
+    assert response.status_code == 400
+
+
+@pytest.mark.parametrize(
+    ("value", "source_base", "target_base", "expected"),
+    [
+        ("11111111", "binary", "binary", "11111111"),
+        ("11111111", "binary", "octal", "377"),
+        ("11111111", "binary", "decimal", "255"),
+        ("11111111", "binary", "hexadecimal", "FF"),
+        ("377", "octal", "binary", "11111111"),
+        ("377", "octal", "octal", "377"),
+        ("377", "octal", "decimal", "255"),
+        ("377", "octal", "hexadecimal", "FF"),
+        ("255", "decimal", "binary", "11111111"),
+        ("255", "decimal", "octal", "377"),
+        ("255", "decimal", "decimal", "255"),
+        ("255", "decimal", "hexadecimal", "FF"),
+        ("FF", "hexadecimal", "binary", "11111111"),
+        ("FF", "hexadecimal", "octal", "377"),
+        ("FF", "hexadecimal", "decimal", "255"),
+        ("FF", "hexadecimal", "hexadecimal", "FF"),
+    ],
+)
+def test_all_base_conversion_combinations(value, source_base, target_base, expected):
+    response = client.post(
+        "/convert",
+        json={"value": value, "source_base": source_base, "target_base": target_base},
+    )
+    assert response.status_code == 200
+    assert response.json()["result"] == expected
+
+
+def test_conversion_rejects_invalid_digit_for_source_base():
+    response = client.post(
+        "/convert",
+        json={"value": "102", "source_base": "binary", "target_base": "octal"},
+    )
+    assert response.status_code == 400
+
+
+def test_conversion_rejects_unsupported_base():
+    response = client.post(
+        "/convert",
+        json={"value": "12", "source_base": "base12", "target_base": "decimal"},
+    )
     assert response.status_code == 400
 
 
