@@ -41,6 +41,30 @@ OPERATIONS = {
     "sqrt": lambda a, b: math.sqrt(a),
 }
 
+BASES = {
+    "binary": 2,
+    "octal": 8,
+    "decimal": 10,
+    "hexadecimal": 16,
+}
+
+
+def format_integer_in_base(value: int, base: int) -> str:
+    """Return an integer as an uppercase, prefix-free representation in ``base``."""
+    if value == 0:
+        return "0"
+
+    digits = "0123456789ABCDEF"
+    sign = "-" if value < 0 else ""
+    remaining = abs(value)
+    converted_digits: list[str] = []
+
+    while remaining:
+        remaining, remainder = divmod(remaining, base)
+        converted_digits.append(digits[remainder])
+
+    return sign + "".join(reversed(converted_digits))
+
 
 @app.post("/calculate", response_model=schemas.CalculationResponse)
 def calculate(request: schemas.CalculationRequest, db: Session = Depends(get_db)):
@@ -66,6 +90,39 @@ def calculate(request: schemas.CalculationRequest, db: Session = Depends(get_db)
     db.refresh(record)
 
     return record
+
+
+@app.post("/convert", response_model=schemas.BaseConversionResponse)
+def convert_base(request: schemas.BaseConversionRequest):
+    """Convert a signed integer between binary, octal, decimal, and hexadecimal."""
+    source_base = request.source_base.lower()
+    target_base = request.target_base.lower()
+
+    if source_base not in BASES or target_base not in BASES:
+        supported_bases = ", ".join(BASES)
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported base. Choose one of: {supported_bases}.",
+        )
+
+    normalized_value = request.value.strip()
+    if not normalized_value:
+        raise HTTPException(status_code=400, detail="Enter a value to convert.")
+
+    try:
+        decimal_value = int(normalized_value, BASES[source_base])
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=400,
+            detail=f"'{request.value}' is not a valid {source_base} integer.",
+        ) from exc
+
+    return schemas.BaseConversionResponse(
+        value=normalized_value.upper(),
+        source_base=source_base,
+        target_base=target_base,
+        result=format_integer_in_base(decimal_value, BASES[target_base]),
+    )
 
 
 @app.get("/history", response_model=List[schemas.CalculationResponse])

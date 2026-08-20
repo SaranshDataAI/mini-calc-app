@@ -56,6 +56,45 @@
         </div>
         <ul id="history"></ul>
       </aside>
+
+      <section class="converter-panel" aria-labelledby="converter-title">
+        <div class="converter-panel__header">
+          <h2 id="converter-title">Base converter</h2>
+          <span>Integer values</span>
+        </div>
+        <label for="conversionValue">Value</label>
+        <input
+          id="conversionValue"
+          type="text"
+          inputmode="text"
+          autocomplete="off"
+          placeholder="e.g. 101101"
+        />
+        <div class="converter-panel__bases">
+          <label for="sourceBase">From
+            <select id="sourceBase">
+              <option value="binary">Binary</option>
+              <option value="octal">Octal</option>
+              <option value="decimal">Decimal</option>
+              <option value="hexadecimal">Hexadecimal</option>
+            </select>
+          </label>
+          <label for="targetBase">To
+            <select id="targetBase">
+              <option value="binary">Binary</option>
+              <option value="octal">Octal</option>
+              <option value="decimal" selected>Decimal</option>
+              <option value="hexadecimal">Hexadecimal</option>
+            </select>
+          </label>
+        </div>
+        <button type="button" id="convertBtn" class="convert-btn">Convert</button>
+        <div class="conversion-result" aria-live="polite">
+          <span>Result</span>
+          <output id="conversionResult">—</output>
+        </div>
+        <p id="conversionError" class="error" aria-live="polite"></p>
+      </section>
     </main>
 
     <script src="script.js"></script>

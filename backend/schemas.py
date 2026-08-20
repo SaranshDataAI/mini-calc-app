@@ -31,3 +31,20 @@ class CalculationResponse(BaseModel):
 
     class Config:
         from_attributes = True  # lets this build directly from a Calculation object
+
+
+class BaseConversionRequest(BaseModel):
+    """Request for converting an integer between supported number bases."""
+
+    value: str
+    source_base: str
+    target_base: str
+
+
+class BaseConversionResponse(BaseModel):
+    """A base-conversion result, represented as text to preserve all digits."""
+
+    value: str
+    source_base: str
+    target_base: str
+    result: str
