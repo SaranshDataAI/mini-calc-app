@@ -254,6 +254,26 @@ button { cursor: pointer; }
   padding: 11px 12px;
 }
 
+.converter-input-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 8px;
+}
+
+.clear-conversion-btn {
+  border: 1px solid #f0d4cf;
+  border-radius: 9px;
+  padding: 0 13px;
+  color: #c95c4b;
+  background: #fff7f5;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.clear-conversion-btn:hover {
+  background: #ffede9;
+}
+
 .converter-panel input:focus,
 .converter-panel select:focus {
   outline: 2px solid var(--blue);

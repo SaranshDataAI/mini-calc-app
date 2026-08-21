@@ -10,6 +10,7 @@ const conversionValueEl = document.getElementById("conversionValue");
 const sourceBaseEl = document.getElementById("sourceBase");
 const targetBaseEl = document.getElementById("targetBase");
 const convertBtn = document.getElementById("convertBtn");
+const clearConversionBtn = document.getElementById("clearConversionBtn");
 const conversionResultEl = document.getElementById("conversionResult");
 const conversionErrorEl = document.getElementById("conversionError");
 
@@ -155,6 +156,10 @@ function symbolFor(operator) {
 }
 
 function formatHistoryItem(item) {
+  if (item.type === "conversion") {
+    return `${item.value} (${item.source_base} → ${item.target_base}) = ${item.result}`;
+  }
+
   if (item.operator === "sqrt") {
     return `√${formatValue(item.a)} = ${formatValue(item.result)}`;
   }
@@ -392,13 +397,22 @@ async function convertBase() {
     }
 
     conversionResultEl.textContent = data.result;
+    await loadHistory();
   } catch (error) {
     conversionErrorEl.textContent = "Could not reach the server. Is the backend running?";
   }
 }
 
+function resetConverterState() {
+  conversionValueEl.value = "";
+  conversionResultEl.textContent = "—";
+  conversionErrorEl.textContent = "";
+  conversionValueEl.focus();
+}
+
 clearHistoryBtn.addEventListener("click", clearHistory);
 convertBtn.addEventListener("click", convertBase);
+clearConversionBtn.addEventListener("click", resetConverterState);
 conversionValueEl.addEventListener("keydown", (event) => {
   if (event.key === "Enter") {
     event.preventDefault();

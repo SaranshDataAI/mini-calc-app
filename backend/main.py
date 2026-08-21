@@ -93,7 +93,7 @@ def calculate(request: schemas.CalculationRequest, db: Session = Depends(get_db)
 
 
 @app.post("/convert", response_model=schemas.BaseConversionResponse)
-def convert_base(request: schemas.BaseConversionRequest):
+def convert_base(request: schemas.BaseConversionRequest, db: Session = Depends(get_db)):
     """Convert a signed integer between binary, octal, decimal, and hexadecimal."""
     source_base = request.source_base.lower()
     target_base = request.target_base.lower()
@@ -117,21 +117,53 @@ def convert_base(request: schemas.BaseConversionRequest):
             detail=f"'{request.value}' is not a valid {source_base} integer.",
         ) from exc
 
-    return schemas.BaseConversionResponse(
+    conversion = models.BaseConversion(
         value=normalized_value.upper(),
         source_base=source_base,
         target_base=target_base,
         result=format_integer_in_base(decimal_value, BASES[target_base]),
     )
+    db.add(conversion)
+    db.commit()
+    db.refresh(conversion)
+
+    return conversion
 
 
-@app.get("/history", response_model=List[schemas.CalculationResponse])
+@app.get("/history", response_model=List[schemas.HistoryResponse])
 def get_history(db: Session = Depends(get_db)):
-    return db.query(models.Calculation).order_by(models.Calculation.id.desc()).all()
+    calculations = db.query(models.Calculation).all()
+    conversions = db.query(models.BaseConversion).all()
+    history = [
+        {
+            "id": item.id,
+            "type": "calculation",
+            "created_at": item.created_at,
+            "a": item.a,
+            "b": item.b,
+            "operator": item.operator,
+            "result": item.result,
+        }
+        for item in calculations
+    ]
+    history.extend(
+        {
+            "id": item.id,
+            "type": "conversion",
+            "created_at": item.created_at,
+            "value": item.value,
+            "source_base": item.source_base,
+            "target_base": item.target_base,
+            "result": item.result,
+        }
+        for item in conversions
+    )
+    return sorted(history, key=lambda item: item["created_at"], reverse=True)
 
 
 @app.delete("/history")
 def clear_history(db: Session = Depends(get_db)):
     deleted = db.query(models.Calculation).delete()
+    deleted += db.query(models.BaseConversion).delete()
     db.commit()
     return {"message": "History cleared", "deleted": deleted}
