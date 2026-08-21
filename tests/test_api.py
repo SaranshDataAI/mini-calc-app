@@ -99,8 +99,30 @@ def test_history_returns_list():
     assert isinstance(response.json(), list)
 
 
+def test_conversion_is_stored_in_history():
+    client.delete("/history")
+    client.post(
+        "/convert",
+        json={"value": "FF", "source_base": "hexadecimal", "target_base": "decimal"},
+    )
+
+    history = client.get("/history")
+
+    assert history.status_code == 200
+    item = history.json()[0]
+    assert item["type"] == "conversion"
+    assert item["value"] == "FF"
+    assert item["source_base"] == "hexadecimal"
+    assert item["target_base"] == "decimal"
+    assert item["result"] == "255"
+
+
 def test_clear_history():
     client.post("/calculate", json={"a": 2, "b": 3, "operator": "add"})
+    client.post(
+        "/convert",
+        json={"value": "101", "source_base": "binary", "target_base": "decimal"},
+    )
     response = client.delete("/history")
     assert response.status_code == 200
     assert response.json()["message"] == "History cleared"

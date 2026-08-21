@@ -48,3 +48,18 @@ class BaseConversionResponse(BaseModel):
     source_base: str
     target_base: str
     result: str
+
+
+class HistoryResponse(BaseModel):
+    """A calculator or base-conversion entry in the shared history feed."""
+
+    id: int
+    type: str
+    created_at: datetime
+    a: Optional[float] = None
+    b: Optional[float] = None
+    operator: Optional[str] = None
+    value: Optional[str] = None
+    source_base: Optional[str] = None
+    target_base: Optional[str] = None
+    result: str | float

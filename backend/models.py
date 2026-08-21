@@ -17,3 +17,14 @@ class Calculation(Base):
     operator = Column(String, nullable=False)
     result = Column(Float, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class BaseConversion(Base):
+    __tablename__ = "base_conversions"
+
+    id = Column(Integer, primary_key=True, index=True)
+    value = Column(String, nullable=False)
+    source_base = Column(String, nullable=False)
+    target_base = Column(String, nullable=False)
+    result = Column(String, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())

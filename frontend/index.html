@@ -64,13 +64,16 @@
           <span>Integer values</span>
         </div>
         <label for="conversionValue">Value</label>
-        <input
-          id="conversionValue"
-          type="text"
-          inputmode="text"
-          autocomplete="off"
-          placeholder="e.g. 101101"
-        />
+        <div class="converter-input-row">
+          <input
+            id="conversionValue"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            placeholder="e.g. 101101"
+          />
+          <button type="button" id="clearConversionBtn" class="clear-conversion-btn">AC</button>
+        </div>
         <div class="converter-panel__bases">
           <label for="sourceBase">From
             <select id="sourceBase">
