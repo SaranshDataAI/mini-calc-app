@@ -92,6 +92,34 @@ def test_conversion_rejects_unsupported_base():
     assert response.status_code == 400
 
 
+@pytest.mark.parametrize(
+    ("value", "source_base", "target_base", "expected"),
+    [
+        ("93.93", "decimal", "binary", "1011101.11(10111000010100011110)"),
+        ("101.101", "binary", "decimal", "5.625"),
+        ("A.F", "hexadecimal", "decimal", "10.9375"),
+        ("-10.5", "decimal", "binary", "-1010.1"),
+    ],
+)
+def test_fractional_base_conversion(value, source_base, target_base, expected):
+    response = client.post(
+        "/convert",
+        json={"value": value, "source_base": source_base, "target_base": target_base},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["result"] == expected
+
+
+def test_conversion_rejects_multiple_decimal_points():
+    response = client.post(
+        "/convert",
+        json={"value": "1.2.3", "source_base": "decimal", "target_base": "binary"},
+    )
+
+    assert response.status_code == 400
+
+
 def test_history_returns_list():
     client.post("/calculate", json={"a": 1, "b": 1, "operator": "add"})
     response = client.get("/history")
