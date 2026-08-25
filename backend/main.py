@@ -66,6 +66,54 @@ def format_integer_in_base(value: int, base: int) -> str:
     return sign + "".join(reversed(converted_digits))
 
 
+def parse_number_in_base(value: str, base: int) -> tuple[int, int]:
+    """Parse a signed base-``base`` number into an exact numerator and denominator."""
+    sign = -1 if value.startswith("-") else 1
+    unsigned_value = value[1:] if value[:1] in "+-" else value
+
+    if unsigned_value.count(".") > 1:
+        raise ValueError("A number can contain only one decimal point.")
+
+    whole_part, separator, fractional_part = unsigned_value.partition(".")
+    if not whole_part and not fractional_part:
+        raise ValueError("A number must contain at least one digit.")
+
+    whole_value = int(whole_part or "0", base)
+    if not separator:
+        return sign * whole_value, 1
+
+    fractional_value = int(fractional_part or "0", base)
+    denominator = base ** len(fractional_part)
+    return sign * (whole_value * denominator + fractional_value), denominator
+
+
+def format_number_in_base(numerator: int, denominator: int, base: int) -> str:
+    """Format an exact fraction, marking recurring fractional digits with parentheses."""
+    digits = "0123456789ABCDEF"
+    sign = "-" if numerator < 0 else ""
+    whole_value, remainder = divmod(abs(numerator), denominator)
+    result = sign + format_integer_in_base(whole_value, base)
+
+    if remainder == 0:
+        return result
+
+    fractional_digits: list[str] = []
+    remainder_positions: dict[int, int] = {}
+    while remainder:
+        if remainder in remainder_positions:
+            repeat_start = remainder_positions[remainder]
+            non_repeating = "".join(fractional_digits[:repeat_start])
+            repeating = "".join(fractional_digits[repeat_start:])
+            return f"{result}.{non_repeating}({repeating})"
+
+        remainder_positions[remainder] = len(fractional_digits)
+        remainder *= base
+        digit, remainder = divmod(remainder, denominator)
+        fractional_digits.append(digits[digit])
+
+    return f"{result}.{''.join(fractional_digits)}"
+
+
 @app.post("/calculate", response_model=schemas.CalculationResponse)
 def calculate(request: schemas.CalculationRequest, db: Session = Depends(get_db)):
     if request.operator not in OPERATIONS:
@@ -94,7 +142,7 @@ def calculate(request: schemas.CalculationRequest, db: Session = Depends(get_db)
 
 @app.post("/convert", response_model=schemas.BaseConversionResponse)
 def convert_base(request: schemas.BaseConversionRequest, db: Session = Depends(get_db)):
-    """Convert a signed integer between binary, octal, decimal, and hexadecimal."""
+    """Convert a signed integer or fractional number between supported bases."""
     source_base = request.source_base.lower()
     target_base = request.target_base.lower()
 
@@ -110,18 +158,20 @@ def convert_base(request: schemas.BaseConversionRequest, db: Session = Depends(g
         raise HTTPException(status_code=400, detail="Enter a value to convert.")
 
     try:
-        decimal_value = int(normalized_value, BASES[source_base])
+        numerator, denominator = parse_number_in_base(
+            normalized_value, BASES[source_base]
+        )
     except ValueError as exc:
         raise HTTPException(
             status_code=400,
-            detail=f"'{request.value}' is not a valid {source_base} integer.",
+            detail=f"'{request.value}' is not a valid {source_base} number.",
         ) from exc
 
     conversion = models.BaseConversion(
         value=normalized_value.upper(),
         source_base=source_base,
         target_base=target_base,
-        result=format_integer_in_base(decimal_value, BASES[target_base]),
+        result=format_number_in_base(numerator, denominator, BASES[target_base]),
     )
     db.add(conversion)
     db.commit()

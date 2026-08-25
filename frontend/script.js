@@ -375,7 +375,7 @@ async function convertBase() {
   conversionErrorEl.textContent = "";
 
   if (!value) {
-    conversionErrorEl.textContent = "Enter an integer to convert.";
+    conversionErrorEl.textContent = "Enter a number to convert.";
     return;
   }
 

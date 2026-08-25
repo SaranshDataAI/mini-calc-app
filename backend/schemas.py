@@ -34,7 +34,7 @@ class CalculationResponse(BaseModel):
 
 
 class BaseConversionRequest(BaseModel):
-    """Request for converting an integer between supported number bases."""
+    """Request for converting an integer or fractional number between bases."""
 
     value: str
     source_base: str
