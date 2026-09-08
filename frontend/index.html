@@ -3,23 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mini Calculator</title>
+    <title>Calcula — Everyday math, beautifully simple</title>
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
     <main class="calculator-app">
       <header class="app-header">
         <div>
-          <p class="eyebrow">Everyday tools</p>
-          <h1>Calculate with clarity.</h1>
+          <p class="eyebrow"><span class="eyebrow__dot"></span> Everyday tools</p>
+          <h1>Math that feels<br />effortless.</h1>
         </div>
-        <p class="app-header__note">Fast arithmetic, saved history, and base conversion in one quiet workspace.</p>
+        <p class="app-header__note">A focused workspace for quick arithmetic, number bases, and the calculations worth keeping.</p>
       </header>
 
       <section class="calculator" aria-label="Calculator">
         <div class="calculator__header">
-          <span class="brand">mini calc</span>
-          <span class="status-dot" aria-hidden="true"></span>
+          <span class="brand"><span class="brand__mark">C</span> calcula</span>
+          <span class="connection-status"><span class="status-dot" aria-hidden="true"></span> Ready</span>
         </div>
 
         <div class="calculator__screen" aria-live="polite">
@@ -32,36 +32,36 @@
           <button class="key key--function" data-action="delete">DEL</button>
           <button class="key key--sqrt" data-action="sqrt">√</button>
           <button class="key key--operator" data-action="operator" data-value="divide">÷</button>
-          <button class="key key--operator" data-action="operator" data-value="multiply">×</button>
 
           <button class="key key--number" data-value="7">7</button>
           <button class="key key--number" data-value="8">8</button>
           <button class="key key--number" data-value="9">9</button>
-          <button class="key key--operator" data-action="operator" data-value="subtract">−</button>
+          <button class="key key--operator" data-action="operator" data-value="multiply">×</button>
 
           <button class="key key--number" data-value="4">4</button>
           <button class="key key--number" data-value="5">5</button>
           <button class="key key--number" data-value="6">6</button>
-          <button class="key key--operator" data-action="operator" data-value="add">+</button>
+          <button class="key key--operator" data-action="operator" data-value="subtract">−</button>
 
           <button class="key key--number" data-value="1">1</button>
           <button class="key key--number" data-value="2">2</button>
           <button class="key key--number" data-value="3">3</button>
-          <button class="key key--equals" id="calcBtn" data-action="calculate">=</button>
+          <button class="key key--operator" data-action="operator" data-value="add">+</button>
 
           <button class="key key--number key--wide" data-value="0">0</button>
           <button class="key key--decimal" data-value=".">.</button>
+          <button class="key key--equals" id="calcBtn" data-action="calculate">=</button>
         </div>
 
         <p id="error" class="error" aria-live="polite"></p>
-        <p class="keyboard-help">Keyboard: 0–9, . , +, −, ×, ÷, Enter/=, Backspace, Esc, R (√)</p>
+        <p class="keyboard-help"><kbd>⌘</kbd> Keyboard ready · 0–9, operators, Enter, Backspace, Esc, R</p>
       </section>
 
       <div class="workspace-rail">
         <section class="converter-panel" aria-labelledby="converter-title">
         <div class="converter-panel__header">
           <h2 id="converter-title">Base converter</h2>
-          <span>Integer values</span>
+          <span>Any base · exact output</span>
         </div>
         <label for="conversionValue">Value</label>
         <div class="converter-input-row">
@@ -72,7 +72,7 @@
             autocomplete="off"
             placeholder="e.g. 101101"
           />
-          <button type="button" id="clearConversionBtn" class="clear-conversion-btn">AC</button>
+          <button type="button" id="clearConversionBtn" class="clear-conversion-btn" aria-label="Clear conversion value">Clear</button>
         </div>
         <div class="converter-panel__bases">
           <label for="sourceBase">From
@@ -92,7 +92,7 @@
             </select>
           </label>
         </div>
-        <button type="button" id="convertBtn" class="convert-btn">Convert</button>
+        <button type="button" id="convertBtn" class="convert-btn">Convert <span aria-hidden="true">→</span></button>
         <div class="conversion-result" aria-live="polite">
           <span>Result</span>
           <output id="conversionResult">—</output>
